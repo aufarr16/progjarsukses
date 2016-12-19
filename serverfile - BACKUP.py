@@ -229,62 +229,53 @@ def QUIT():
     print status
     session = '(not logged in)'
     loggedIn = 0
-    exit()
 
 
 def InputFunc(message, sock):
+    message = sock.recv(1024)
+    print message
+    command = message.split(" ")[0]
 
-    while 1:
-        input_list = []
-        input_list.append(sock)
-        input, output, exception = select.select(input_list, [], [])
-
-        for sock in input:
-
-            message = sock.recv(1024)
-            print message
-            command = message.split(" ")[0]
-
-            if command == 'DELE':
-                argument = message.split(" ")[1]
-                DELE(sock, argument)
-            elif command == 'RMD':
-                argument = message.split(" ")[1]
-                RMD(sock, argument)
-            elif command == 'CWD':
-                argument = message.split(" ")[1]
-                CWD(sock, argument)
-            elif command == 'USER':
-                argument = message.split(" ")[1]
-                USER(sock, argument)
-            elif command == 'PASS':
-                argument = message.split(" ")[1]
-                PASS(sock, argument)
-            elif command == 'RETR':
-                argument = message.split(" ")[1]
-                RETR(sock, argument)
-            elif command == 'STOR':
-                argument = message.split(" ")[1]
-                STOR(sock, argument)
-            elif command == 'MKD':
-                argument = message.split(" ")[1]
-                MKD(sock, argument)
-            elif command == 'RNTO':
-                argument1 = message.split(" ")[1]
-                argument2 = message.split(" ")[2]
-                RNTO(sock, argument1, argument2)
-            elif command == 'HELP':
-                HELP(sock)
-            elif command == 'PWD':
-                PWD(sock)
-            elif command == 'LIST':
-                LIST(sock)
-            elif command == 'QUIT':
-                QUIT()
-            else:
-                status = '500 Internal server error'
-                print status
-                sock.send(status)
+    if command == 'DELE':
+        argument = message.split(" ")[1]
+        DELE(sock, argument)
+    elif command == 'RMD':
+        argument = message.split(" ")[1]
+        RMD(sock, argument)
+    elif command == 'CWD':
+        argument = message.split(" ")[1]
+        CWD(sock, argument)
+    elif command == 'USER':
+        argument = message.split(" ")[1]
+        USER(sock, argument)
+    elif command == 'PASS':
+        argument = message.split(" ")[1]
+        PASS(sock, argument)
+    elif command == 'RETR':
+        argument = message.split(" ")[1]
+        RETR(sock, argument)
+    elif command == 'STOR':
+        argument = message.split(" ")[1]
+        STOR(sock, argument)
+    elif command == 'MKD':
+        argument = message.split(" ")[1]
+        MKD(sock, argument)
+    elif command == 'RNTO':
+        argument1 = message.split(" ")[1]
+        argument2 = message.split(" ")[2]
+        RNTO(sock, argument1, argument2)
+    elif command == 'HELP':
+        HELP(sock)
+    elif command == 'PWD':
+        PWD(sock)
+    elif command == 'LIST':
+        LIST(sock)
+    elif command == 'QUIT':
+        QUIT(sock)
+    else:
+        status = '500 Internal server error'
+        print status
+        sock.send(status)
 
 
 def Main():
@@ -297,19 +288,11 @@ def Main():
     s.listen(5)
 
     print "FTP Server Started."
-
     while True:
-
-        input_list = []
-        input_list.append(s)
-        input, output, exception = select.select(input_list, [], [])
-
-        for sock in input:
-            if sock == s:
-                c, addr = sock.accept()
-                # print "client connedted ip: " + str(addr)
-                t = threading.Thread(target=InputFunc, args=("InputFunction", c))
-                t.start()
+        c, addr = s.accept()
+        # print "client connedted ip: " + str(addr)
+        t = threading.Thread(target=InputFunc, args=("InputFunction", c))
+        t.start()
 
     s.close()
 
