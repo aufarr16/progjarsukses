@@ -2,7 +2,7 @@ import socket
 
 
 def InputFunc(sock):
-    availableCommand = ['DELE', 'PWD', 'USER', 'PASS' ,'CWD', 'RETR', 'DELE', 'RMD']
+    availableCommand = ['DELE', 'USER', 'PASS', 'CWD', 'RETR', 'RMD', 'QUIT']
     cmd = raw_input("Enter command: ")
     cmdCheck = cmd.split(" ")[0]
 
@@ -13,17 +13,14 @@ def InputFunc(sock):
 
     else:
         print 'COMMAND NOT FOUND'
-        InputFunc(sock)
 
 
 def Main():
     host = '127.0.0.1'
-    port = 21
-
+    port = 5000
     sock = socket.socket()
     sock.connect((host, port))
 
-    # input function
     InputFunc(sock)
 
     sock.close()
