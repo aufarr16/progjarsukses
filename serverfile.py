@@ -2,10 +2,27 @@ import socket
 import threading
 import os
 
+workingDir = ''
+
+
+def CWD(sock, dirname):
+    global workingDir
+    dir = os.getcwd()
+    myDir = dir + workingDir + '\\' + dirname
+    if os.path.exists(myDir):
+        workingDir = '\\'+dirname
+        status = '250 Directory changed successfully, new dir: '+workingDir
+        print status
+        sock.send(status)
+    else:
+        status = '550 Directory not found'
+        print status
+        sock.send(status)
+
 
 def DELE(sock, filename):
     dir = os.getcwd()
-    deleteme = dir+'\\'+filename
+    deleteme = dir+workingDir+'\\'+filename
     if os.path.exists(deleteme):
         os.remove(deleteme)
         status = '250 File deleted successfully'
@@ -33,6 +50,7 @@ def RMD(sock, dirname):
 
 def InputFunc(message, sock):
     message = sock.recv(1024)
+    print message
     command = message.split(" ")[0]
     argument = message.split(" ")[1]
 
@@ -40,8 +58,10 @@ def InputFunc(message, sock):
         DELE(sock, argument)
     elif command == 'RMD':
         RMD(sock, argument)
+    elif command == 'CWD':
+        CWD(sock, argument)
     else:
-        sock.send('UNKNOWN')
+        sock.send('UNKNOWN COMMAND')
 
 
 def Main():
@@ -53,12 +73,11 @@ def Main():
 
     s.listen(5)
 
-    print "Server Started."
+    print "FTP Server Started."
     while True:
         c, addr = s.accept()
-        print "client connedted ip:<" + str(addr) + ">"
-
-        t = threading.Thread(target=InputFunc, args=("RetrThread", c))
+        print "client connedted ip: " + str(addr)
+        t = threading.Thread(target=InputFunc, args=("InputFunction", c))
         t.start()
 
     s.close()

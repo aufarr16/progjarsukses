@@ -1,9 +1,15 @@
 Andi Ersaldy Raisha Pakki (5114100009)
 USER
 PASS
-CWD
+CWD v
 RETR
 DELE v
 RMD v
 
 Aufar Rizqi (5114100124)
+STOR
+RNTO v 
+MKD v
+PWD v
+LIST v
+HELP v
